@@ -1,66 +1,81 @@
-const express = require("express");
-const path = require("path");
-const compression = require("compression");
-const helmet = require("helmet");
-const morgan = require("morgan");
-const cookieParser = require("cookie-parser");
-const session = require("express-session");
+/**
+ * ---------------------------------------------------------
+ * SMS Hindi Shayari
+ * Production Server Entry
+ * ---------------------------------------------------------
+ */
 
-const connectDB = require("./config/db");
-const publicRoutes = require("./routes/public");
+require("dotenv").config();
 
-const app = express();
+const http = require("http");
+const mongoose = require("mongoose");
 
-// Connect MongoDB
-connectDB();
+const app = require("./app");
+const connectDatabase = require("./config/db");
 
-// Render PORT
+// Handle Uncaught Exceptions
+process.on("uncaughtException", (error) => {
+    console.error("UNCAUGHT EXCEPTION");
+    console.error(error);
+
+    process.exit(1);
+});
+
 const PORT = process.env.PORT || 3000;
 
-// Security
-app.use(helmet());
+(async () => {
+    try {
 
-// Compression
-app.use(compression());
+        // Connect MongoDB
+        await connectDatabase();
 
-// Logger
-app.use(morgan("dev"));
+        // Create HTTP Server
+        const server = http.createServer(app);
 
-// Body Parser
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+        // Start Server
+        server.listen(PORT, () => {
+            console.log("==================================");
+            console.log(" SMS Hindi Shayari");
+            console.log(" Production Server Started");
+            console.log(` Port : ${PORT}`);
+            console.log(` Environment : ${process.env.NODE_ENV || "development"}`);
+            console.log("==================================");
+        });
 
-// Cookie Parser
-app.use(cookieParser());
+        // MongoDB Connection Events
+        mongoose.connection.on("disconnected", () => {
+            console.warn("MongoDB Disconnected");
+        });
 
-// Session
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || "change_this_secret",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      maxAge: 24 * 60 * 60 * 1000
+        mongoose.connection.on("reconnected", () => {
+            console.log("MongoDB Reconnected");
+        });
+
+        // Unhandled Promise Rejection
+        process.on("unhandledRejection", (error) => {
+            console.error("UNHANDLED PROMISE REJECTION");
+            console.error(error);
+
+            server.close(() => {
+                process.exit(1);
+            });
+        });
+
+        // Graceful Shutdown
+        process.on("SIGINT", async () => {
+            console.log("\nStopping Server...");
+
+            await mongoose.connection.close();
+
+            process.exit(0);
+        });
+
+    } catch (error) {
+
+        console.error("SERVER START FAILED");
+        console.error(error);
+
+        process.exit(1);
+
     }
-  })
-);
-
-// Static Files
-app.use(express.static(path.join(__dirname, "public")));
-
-// View Engine
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
-
-app.use("/", publicRoutes);
-
-
-// 404 Route
-app.use((req, res) => {
-  res.status(404).send("404 | Page Not Found");
-});
-
-// Start Server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+})();
