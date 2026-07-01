@@ -6,6 +6,8 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 
 import apiRoutes from "./routes/index.js";
+import notFound from "./middleware/notFound.middleware.js";
+import errorHandler from "./middleware/error.middleware.js";
 
 const app = express();
 
@@ -40,11 +42,8 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1", apiRoutes);
 
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: "Route Not Found"
-  });
-});
+app.use(notFound);
+
+app.use(errorHandler);
 
 export default app;
