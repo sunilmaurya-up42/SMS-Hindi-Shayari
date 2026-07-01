@@ -3,28 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
+    <title><%= title || "Multilingual Shayari" %></title>
 
     <link rel="stylesheet" href="/css/style.css">
+
+    <meta name="description" content="Read Love, Sad, Attitude, Friendship, Motivational and Multilingual Shayari.">
+    <meta name="keywords" content="Shayari, Hindi Shayari, Love Shayari, Sad Shayari">
+    <meta name="author" content="Multilingual Shayari">
 </head>
+
 <body>
 
-<header>
+<header class="header">
 
-    <h1>🌍 Multilingual Shayari Website</h1>
+    <div class="container">
 
-    <nav>
+        <div class="logo">
+            <a href="/">
+                🌍 Multilingual Shayari
+            </a>
+        </div>
 
-        <a href="/">Home</a>
+        <nav class="navbar">
 
-        <a href="/category/Love">Love</a>
+            <ul>
 
-        <a href="/category/Sad">Sad</a>
+                <li><a href="/">Home</a></li>
 
-        <a href="/category/Friendship">Friendship</a>
+                <li><a href="/category/Love">Love</a></li>
 
-    </nav>
+                <li><a href="/category/Sad">Sad</a></li>
 
-    <hr>
+                <li><a href="/category/Friendship">Friendship</a></li>
+
+                <li><a href="/category/Attitude">Attitude</a></li>
+
+                <li><a href="/category/Motivational">Motivational</a></li>
+
+            </ul>
+
+        </nav>
+
+    </div>
 
 </header>
+
+<main class="container">
