@@ -10,131 +10,148 @@
 const express = require("express");
 const router = express.Router();
 
-const Shayari = require("../models/Shayari");
-const Category = require("../models/Category");
+const shayariController = require("../controllers/shayari");
 
-const { optionalAuth } = require("../middleware/auth");
-const { paginate } = require("../utils/helpers");
-const { asyncHandler } = require("../utils/helpers");
+const {
+    optionalAuth,
+    isAuthenticated
+} = require("../middleware/auth");
 
 /* ==================================
-   All Shayari (Page + API Ready)
+   All Shayari
 ================================== */
 
 router.get(
     "/",
     optionalAuth,
-    asyncHandler(async (req, res) => {
-
-        const { page, limit, skip } = paginate(req.query.page, 20);
-
-        const shayaries = await Shayari.find({ isActive: true })
-            .populate("category", "name slug")
-            .sort({ createdAt: -1 })
-            .skip(skip)
-            .limit(limit);
-
-        return res.render("pages/shayari/index", {
-            title: "All Shayari",
-            shayaries,
-            page,
-            user: req.user || null
-        });
-
-    })
+    shayariController.allShayari
 );
 
 /* ==================================
-   Single Shayari by Slug
+   Featured Shayari
 ================================== */
 
 router.get(
-    "/:slug",
+    "/featured",
     optionalAuth,
-    asyncHandler(async (req, res) => {
-
-        const shayari = await Shayari.findOne({
-            slug: req.params.slug,
-            isActive: true
-        }).populate("category");
-
-        if (!shayari) {
-            return res.status(404).render("errors/404", {
-                title: "Not Found"
-            });
-        }
-
-        return res.render("pages/shayari/detail", {
-            title: shayari.title,
-            shayari,
-            user: req.user || null
-        });
-
-    })
+    shayariController.featured
 );
 
 /* ==================================
-   Category Wise Shayari
+   Trending Shayari
+================================== */
+
+router.get(
+    "/trending",
+    optionalAuth,
+    shayariController.trending
+);
+
+/* ==================================
+   Latest Shayari
+================================== */
+
+router.get(
+    "/latest",
+    optionalAuth,
+    shayariController.latest
+);
+
+/* ==================================
+   Category Wise
 ================================== */
 
 router.get(
     "/category/:slug",
     optionalAuth,
-    asyncHandler(async (req, res) => {
-
-        const category = await Category.findOne({
-            slug: req.params.slug
-        });
-
-        if (!category) {
-            return res.status(404).render("errors/404", {
-                title: "Category Not Found"
-            });
-        }
-
-        const shayaries = await Shayari.find({
-            category: category._id,
-            isActive: true
-        })
-            .sort({ createdAt: -1 });
-
-        return res.render("pages/shayari/category", {
-            title: category.name,
-            category,
-            shayaries,
-            user: req.user || null
-        });
-
-    })
+    shayariController.category
 );
 
 /* ==================================
-   Search Shayari
+   Search
 ================================== */
 
 router.get(
     "/search",
     optionalAuth,
-    asyncHandler(async (req, res) => {
+    shayariController.search
+);
 
-        const q = req.query.q || "";
+/* ==================================
+   Tag Wise
+================================== */
 
-        const shayaries = await Shayari.find({
-            isActive: true,
-            $or: [
-                { title: { $regex: q, $options: "i" } },
-                { content: { $regex: q, $options: "i" } }
-            ]
-        }).limit(50);
+router.get(
+    "/tag/:tag",
+    optionalAuth,
+    shayariController.tag
+);
 
-        return res.render("pages/shayari/search", {
-            title: "Search Results",
-            query: q,
-            shayaries,
-            user: req.user || null
-        });
+/* ==================================
+   Language Wise
+================================== */
 
-    })
+router.get(
+    "/language/:language",
+    optionalAuth,
+    shayariController.language
+);
+
+/* ==================================
+   Like
+================================== */
+
+router.post(
+    "/:id/like",
+    isAuthenticated,
+    shayariController.like
+);
+
+/* ==================================
+   Download
+================================== */
+
+router.post(
+    "/:id/download",
+    optionalAuth,
+    shayariController.download
+);
+
+/* ==================================
+   Favorite
+================================== */
+
+router.post(
+    "/:id/favorite",
+    isAuthenticated,
+    shayariController.favorite
+);
+
+router.delete(
+    "/:id/favorite",
+    isAuthenticated,
+    shayariController.removeFavorite
+);
+
+/* ==================================
+   Share
+================================== */
+
+router.post(
+    "/:id/share",
+    optionalAuth,
+    shayariController.share
+);
+
+/* ==================================
+   Single Shayari
+   (Always Keep Last)
+================================== */
+
+router.get(
+    "/:slug",
+    optionalAuth,
+    shayariController.singleShayari
 );
 
 /* ==================================
