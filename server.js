@@ -7,6 +7,7 @@ const cookieParser = require("cookie-parser");
 const session = require("express-session");
 
 const connectDB = require("./config/db");
+const publicRoutes = require("./routes/public");
 
 const app = express();
 
@@ -51,10 +52,8 @@ app.use(express.static(path.join(__dirname, "public")));
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// Home Route
-app.get("/", (req, res) => {
-  res.send("✅ Multilingual Shayari Website Server Running...");
-});
+app.use("/", publicRoutes);
+
 
 // 404 Route
 app.use((req, res) => {
