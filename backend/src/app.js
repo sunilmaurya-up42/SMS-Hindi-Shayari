@@ -1,57 +1,49 @@
 import express from "express";
-import cors from "cors";
 import helmet from "helmet";
+import cors from "cors";
 import compression from "compression";
+import cookieParser from "cookie-parser";
 import morgan from "morgan";
+
+import apiRoutes from "./routes/index.js";
 
 const app = express();
 
-// Security
+app.disable("x-powered-by");
+
 app.use(helmet());
 
-// Compression
-app.use(compression());
-
-// CORS
 app.use(
   cors({
-    origin: "*",
-    credentials: true,
+    origin: true,
+    credentials: true
   })
 );
 
-// Body Parser
+app.use(compression());
+
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-// Logger
+app.use(cookieParser());
+
 app.use(morgan("dev"));
 
-// Root Route
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
-    message: "Welcome to SMS Hindi Shayari API",
-    version: "v1.0.0",
+    application: "SMS Hindi Shayari API",
+    version: "v1",
     status: "Running"
   });
 });
 
-// Health Route
-app.get("/api/v1/health", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "Server is healthy",
-    version: "v1",
-    uptime: process.uptime()
-  });
-});
+app.use("/api/v1", apiRoutes);
 
-// 404
 app.use((req, res) => {
   res.status(404).json({
     success: false,
-    message: "Route not found"
+    message: "Route Not Found"
   });
 });
 
