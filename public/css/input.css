@@ -1,18 +1,3 @@
-body {
-    margin: 0;
-    padding: 20px;
-    font-family: Arial, sans-serif;
-}
+@config "../../tailwind.config.js";
 
-header {
-    margin-bottom: 20px;
-}
-
-nav a {
-    margin-right: 15px;
-    text-decoration: none;
-}
-
-footer {
-    margin-top: 30px;
-}
+@import "tailwindcss";
