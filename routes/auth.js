@@ -10,7 +10,8 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-
+const User = require("../models/User");
+const bcrypt = require("bcrypt");
 const {
     isGuest,
     isAuthenticated
@@ -82,13 +83,41 @@ router.post(
 
         try {
 
-            // NOTE: Actual user creation will be handled in controller layer later
-            // For now redirect to login
+            const {
+                name,
+                email,
+                password
+            } = req.body;
+
+            const exists = await User.findOne({
+                email: email.toLowerCase().trim()
+            });
+
+            if (exists) {
+                return res.render("auth/register", {
+                    title: "Register",
+                    error: "Email already registered."
+                });
+            }
+
+            const hash = await bcrypt.hash(password, 12);
+
+            await User.create({
+
+                name,
+
+                email: email.toLowerCase().trim(),
+
+                password: hash
+
+            });
 
             return res.redirect("/auth/login");
 
-        } catch (err) {
-            next(err);
+        } catch (error) {
+
+            next(error);
+
         }
 
     }
