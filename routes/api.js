@@ -36,7 +36,10 @@ router.get(
         const limit = Number(req.query.limit) || 20;
         const skip = (page - 1) * limit;
 
-        const data = await Shayari.find({ isActive: true })
+        const data = await Shayari.find({
+    status: "published",
+    visibility: "public"
+})
             .populate("category", "name slug")
             .sort({ createdAt: -1 })
             .skip(skip)
@@ -61,9 +64,12 @@ router.get(
     asyncHandler(async (req, res) => {
 
         const data = await Shayari.findOne({
-            slug: req.params.slug,
-            isActive: true
-        }).populate("category");
+    slug: req.params.slug,
+    status: "published",
+    visibility: "public"
+})
+.populate("category")
+.populate("author", "name");
 
         if (!data) {
             return res.status(404).json({
