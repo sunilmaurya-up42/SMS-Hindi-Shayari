@@ -1,1 +1,257 @@
+/**
+ * -------------------------------------------------------
+ * SMS Hindi Shayari
+ * Admin Routes
+ * -------------------------------------------------------
+ */
 
+"use strict";
+
+const express = require("express");
+const router = express.Router();
+
+/* Models */
+const Shayari = require("../models/Shayari");
+const Category = require("../models/Category");
+const Contact = require("../models/Contact");
+const User = require("../models/User");
+const Background = require("../models/Background");
+const AIImage = require("../models/AIImage");
+
+/* Middleware */
+const { isAdmin } = require("../middleware/admin");
+const { upload } = require("../middleware/upload");
+const { validateShayari, validateCategory } = require("../middleware/validation");
+const { asyncHandler } = require("../utils/helpers");
+
+/* ==================================
+   Admin Dashboard
+================================== */
+
+router.get(
+    "/",
+    isAdmin,
+    asyncHandler(async (req, res) => {
+
+        const [users, shayaries, categories, contacts] = await Promise.all([
+            User.countDocuments(),
+            Shayari.countDocuments(),
+            Category.countDocuments(),
+            Contact.countDocuments({ status: "new" })
+        ]);
+
+        return res.render("admin/dashboard", {
+            title: "Admin Dashboard",
+            stats: {
+                users,
+                shayaries,
+                categories,
+                contacts
+            },
+            user: req.user
+        });
+
+    })
+);
+
+/* ==================================
+   SHAYARI MANAGEMENT
+================================== */
+
+/* List */
+router.get(
+    "/shayari",
+    isAdmin,
+    asyncHandler(async (req, res) => {
+
+        const list = await Shayari.find()
+            .populate("category")
+            .sort({ createdAt: -1 });
+
+        return res.render("admin/shayari/list", {
+            title: "Manage Shayari",
+            list
+        });
+
+    })
+);
+
+/* Create Form */
+router.get("/shayari/create", isAdmin, (req, res) => {
+    res.render("admin/shayari/create", {
+        title: "Create Shayari"
+    });
+});
+
+/* Create */
+router.post(
+    "/shayari/create",
+    isAdmin,
+    validateShayari,
+    asyncHandler(async (req, res) => {
+
+        await Shayari.create(req.body);
+
+        return res.redirect("/admin/shayari");
+
+    })
+);
+
+/* Delete */
+router.get(
+    "/shayari/delete/:id",
+    isAdmin,
+    asyncHandler(async (req, res) => {
+
+        await Shayari.findByIdAndDelete(req.params.id);
+
+        return res.redirect("/admin/shayari");
+
+    })
+);
+
+/* ==================================
+   CATEGORY MANAGEMENT
+================================== */
+
+/* List */
+router.get(
+    "/category",
+    isAdmin,
+    asyncHandler(async (req, res) => {
+
+        const list = await Category.find().sort({ createdAt: -1 });
+
+        return res.render("admin/category/list", {
+            title: "Manage Category",
+            list
+        });
+
+    })
+);
+
+/* Create */
+router.post(
+    "/category/create",
+    isAdmin,
+    validateCategory,
+    asyncHandler(async (req, res) => {
+
+        await Category.create(req.body);
+
+        return res.redirect("/admin/category");
+
+    })
+);
+
+/* Delete */
+router.get(
+    "/category/delete/:id",
+    isAdmin,
+    asyncHandler(async (req, res) => {
+
+        await Category.findByIdAndDelete(req.params.id);
+
+        return res.redirect("/admin/category");
+
+    })
+);
+
+/* ==================================
+   CONTACT MANAGEMENT
+================================== */
+
+router.get(
+    "/contacts",
+    isAdmin,
+    asyncHandler(async (req, res) => {
+
+        const list = await Contact.find().sort({ createdAt: -1 });
+
+        return res.render("admin/contact/list", {
+            title: "Contact Messages",
+            list
+        });
+
+    })
+);
+
+/* Reply Contact */
+router.post(
+    "/contacts/reply/:id",
+    isAdmin,
+    asyncHandler(async (req, res) => {
+
+        const contact = await Contact.findById(req.params.id);
+
+        if (contact) {
+            await contact.reply(req.body.reply, req.user._id);
+        }
+
+        return res.redirect("/admin/contacts");
+
+    })
+);
+
+/* ==================================
+   USER MANAGEMENT
+================================== */
+
+router.get(
+    "/users",
+    isAdmin,
+    asyncHandler(async (req, res) => {
+
+        const list = await User.find().sort({ createdAt: -1 });
+
+        return res.render("admin/users/list", {
+            title: "Users",
+            list
+        });
+
+    })
+);
+
+/* ==================================
+   IMAGE UPLOAD (BACKGROUND)
+================================== */
+
+router.post(
+    "/background/upload",
+    isAdmin,
+    upload.single("image"),
+    asyncHandler(async (req, res) => {
+
+        // Placeholder: GitHub upload logic later
+        return res.json({
+            success: true,
+            message: "Uploaded successfully (temp)"
+        });
+
+    })
+);
+
+/* ==================================
+   AI IMAGE LIST
+================================== */
+
+router.get(
+    "/ai-images",
+    isAdmin,
+    asyncHandler(async (req, res) => {
+
+        const list = await AIImage.find().sort({ createdAt: -1 });
+
+        return res.render("admin/ai/list", {
+            title: "AI Images",
+            list
+        });
+
+    })
+);
+
+/* ==================================
+   Export
+================================== */
+
+module.exports = router;
