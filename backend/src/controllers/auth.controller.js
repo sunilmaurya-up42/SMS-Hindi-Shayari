@@ -9,6 +9,12 @@ export const googleCallback = async (req, res) => {
     user: req.user
   });
 };
+export const logout = async (req, res) => {
+  return res.status(200).json({
+    success: true,
+    message: "Logged out successfully."
+  });
+};
 
 export const currentUser = async (req, res) => {
   return res.status(200).json({
