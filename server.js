@@ -6,9 +6,14 @@ const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 
+const connectDB = require("./config/db");
+
 const app = express();
 
-// Render ke liye PORT
+// Connect MongoDB
+connectDB();
+
+// Render PORT
 const PORT = process.env.PORT || 3000;
 
 // Security
@@ -39,7 +44,7 @@ app.use(
   })
 );
 
-// Static Folder
+// Static Files
 app.use(express.static(path.join(__dirname, "public")));
 
 // View Engine
