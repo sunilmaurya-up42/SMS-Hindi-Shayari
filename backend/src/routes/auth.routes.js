@@ -1,12 +1,13 @@
 import { Router } from "express";
 import passport from "passport";
 
-import {
-  googleCallback
-} from "../controllers/auth.controller.js";
+import authenticate from "../middleware/auth.middleware.js";
+import { currentUser, googleCallback, logout } from "../controllers/auth.controller.js";
 
 const router = Router();
+router.get("/me", authenticate, currentUser);
 
+router.post("/logout", authenticate, logout);
 router.get(
   "/google",
   passport.authenticate("google", {
