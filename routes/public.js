@@ -2,62 +2,16 @@ const express = require("express");
 
 const router = express.Router();
 
-/*
-|--------------------------------------------------------------------------
-| Home Page
-|--------------------------------------------------------------------------
-*/
+const publicController = require("../controllers/publicController");
 
-router.get("/", (req, res) => {
-  res.send("🏠 Home Page");
-});
+router.get("/", publicController.home);
 
-/*
-|--------------------------------------------------------------------------
-| Language Page
-|--------------------------------------------------------------------------
-*/
+router.get("/language/:language", publicController.language);
 
-router.get("/language/:language", (req, res) => {
-  const { language } = req.params;
+router.get("/category/:category", publicController.category);
 
-  res.send(`Language : ${language}`);
-});
+router.get("/shayari/:slug", publicController.shayari);
 
-/*
-|--------------------------------------------------------------------------
-| Category Page
-|--------------------------------------------------------------------------
-*/
-
-router.get("/category/:category", (req, res) => {
-  const { category } = req.params;
-
-  res.send(`Category : ${category}`);
-});
-
-/*
-|--------------------------------------------------------------------------
-| Single Shayari
-|--------------------------------------------------------------------------
-*/
-
-router.get("/shayari/:slug", (req, res) => {
-  const { slug } = req.params;
-
-  res.send(`Shayari : ${slug}`);
-});
-
-/*
-|--------------------------------------------------------------------------
-| Search
-|--------------------------------------------------------------------------
-*/
-
-router.get("/search", (req, res) => {
-  const keyword = req.query.q || "";
-
-  res.send(`Search : ${keyword}`);
-});
+router.get("/search", publicController.search);
 
 module.exports = router;
