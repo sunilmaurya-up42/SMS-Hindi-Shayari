@@ -90,7 +90,13 @@ router.post(
     validateShayari,
     asyncHandler(async (req, res) => {
 
-        await Shayari.create(req.body);
+        await Shayari.create({
+
+    ...req.body,
+
+    author: req.user._id
+
+});
 
         return res.redirect("/admin/shayari");
 
@@ -137,7 +143,15 @@ router.post(
     validateCategory,
     asyncHandler(async (req, res) => {
 
-        await Category.create(req.body);
+        const exists = await Category.findOne({
+    name: req.body.name.trim()
+});
+
+if (exists) {
+    return res.redirect("/admin/category");
+}
+
+await Category.create(req.body);
 
         return res.redirect("/admin/category");
 
