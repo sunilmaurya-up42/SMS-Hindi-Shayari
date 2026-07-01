@@ -3,34 +3,28 @@ import http from "http";
 import app from "./app.js";
 import { env } from "./config/env.js";
 import { connectDatabase } from "./database/connectDatabase.js";
+import logger from "./config/logger.js";
 
 const startServer = async () => {
   try {
-    if (env.MONGODB_URI) {
-      await connectDatabase(env.MONGODB_URI);
-    } else {
-      console.warn("⚠️ MONGODB_URI not configured. Starting without database.");
+    if (!env.MONGODB_URI) {
+      throw new Error("MONGODB_URI is missing.");
     }
+
+    await connectDatabase(env.MONGODB_URI);
 
     const server = http.createServer(app);
 
     server.listen(env.PORT, () => {
-      console.log(`
-=========================================
-🚀 SMS Hindi Shayari API
-=========================================
-Environment : ${env.NODE_ENV}
-Port        : ${env.PORT}
-=========================================
-      `);
+      logger.info(
+        `Server Running on Port ${env.PORT} (${env.NODE_ENV})`
+      );
     });
+
   } catch (error) {
-    console.error(error);
+    logger.error(error.message);
     process.exit(1);
   }
 };
 
 startServer();
-
-process.on("SIGINT", () => process.exit(0));
-process.on("SIGTERM", () => process.exit(0));
