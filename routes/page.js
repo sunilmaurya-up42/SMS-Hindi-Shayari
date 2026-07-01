@@ -1,7 +1,7 @@
 /**
  * -------------------------------------------------------
  * SMS Hindi Shayari
- * Page Routes (Static + Forms)
+ * Page Routes
  * -------------------------------------------------------
  */
 
@@ -11,39 +11,34 @@ const express = require("express");
 const router = express.Router();
 
 const Contact = require("../models/Contact");
+const pageController = require("../controllers/page");
 
 const { optionalAuth } = require("../middleware/auth");
 const { validateContact } = require("../middleware/validation");
 const { asyncHandler } = require("../utils/helpers");
 
 /* ==================================
-   About Page
+   About
 ================================== */
 
-router.get("/about", optionalAuth, (req, res) => {
-
-    res.render("pages/about", {
-        title: "About Us",
-        user: req.user || null
-    });
-
-});
+router.get(
+    "/about",
+    optionalAuth,
+    pageController.about
+);
 
 /* ==================================
-   Contact Page
+   Contact
 ================================== */
 
-router.get("/contact", optionalAuth, (req, res) => {
-
-    res.render("pages/contact", {
-        title: "Contact Us",
-        user: req.user || null
-    });
-
-});
+router.get(
+    "/contact",
+    optionalAuth,
+    pageController.contact
+);
 
 /* ==================================
-   Submit Contact Form
+   Contact Form
 ================================== */
 
 router.post(
@@ -76,40 +71,31 @@ router.post(
    Privacy Policy
 ================================== */
 
-router.get("/privacy-policy", optionalAuth, (req, res) => {
-
-    res.render("pages/privacy", {
-        title: "Privacy Policy",
-        user: req.user || null
-    });
-
-});
+router.get(
+    "/privacy-policy",
+    optionalAuth,
+    pageController.privacyPolicy
+);
 
 /* ==================================
    Terms
 ================================== */
 
-router.get("/terms", optionalAuth, (req, res) => {
-
-    res.render("pages/terms", {
-        title: "Terms & Conditions",
-        user: req.user || null
-    });
-
-});
+router.get(
+    "/terms",
+    optionalAuth,
+    pageController.terms
+);
 
 /* ==================================
    Disclaimer
 ================================== */
 
-router.get("/disclaimer", optionalAuth, (req, res) => {
-
-    res.render("pages/disclaimer", {
-        title: "Disclaimer",
-        user: req.user || null
-    });
-
-});
+router.get(
+    "/disclaimer",
+    optionalAuth,
+    pageController.disclaimer
+);
 
 /* ==================================
    Export
