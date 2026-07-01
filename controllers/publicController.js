@@ -1,7 +1,8 @@
 const home = (req, res) => {
-  res.send("🏠 Home Page");
+  res.render("pages/home", {
+    title: "Home"
+  });
 };
-
 const language = (req, res) => {
   const { language } = req.params;
 
