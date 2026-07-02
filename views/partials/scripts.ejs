@@ -1,1 +1,337 @@
+<!-- =====================================
+     Bootstrap Bundle
+===================================== -->
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- =====================================
+     Font Awesome
+===================================== -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/js/all.min.js"></script>
+
+<!-- =====================================
+     Axios
+===================================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<!-- =====================================
+     SweetAlert2
+===================================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- =====================================
+     Global Variables
+===================================== -->
+
+<script>
+
+window.APP = {
+
+    csrf: "<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>",
+
+    user: <%- JSON.stringify(user || null) %>
+
+};
+
+</script>
+
+<!-- =====================================
+     Common Functions
+===================================== -->
+
+<script>
+
+function showSuccess(message){
+
+    Swal.fire({
+
+        icon:"success",
+
+        title:"Success",
+
+        text:message,
+
+        timer:1800,
+
+        showConfirmButton:false
+
+    });
+
+}
+
+function showError(message){
+
+    Swal.fire({
+
+        icon:"error",
+
+        title:"Error",
+
+        text:message
+
+    });
+
+}
+
+function copyText(text){
+
+    navigator.clipboard.writeText(text)
+
+    .then(()=>{
+
+        showSuccess("Copied successfully.");
+
+    })
+
+    .catch(()=>{
+
+        showError("Unable to copy.");
+
+    });
+
+}
+
+function downloadFile(url){
+
+    window.open(url,"_blank");
+
+}
+
+</script>
+
+<!-- =====================================
+     Auto Hide Alerts
+===================================== -->
+
+<script>
+
+setTimeout(()=>{
+
+    document.querySelectorAll(".alert").forEach(el=>{
+
+        el.classList.remove("show");
+
+        el.classList.add("fade");
+
+    });
+
+},4000);
+
+</script>
+
+<!-- =====================================
+     Loading Spinner
+===================================== -->
+
+<script>
+
+window.addEventListener("load",()=>{
+
+    const loader=document.getElementById("pageLoader");
+
+    if(loader){
+
+        loader.style.opacity="0";
+
+        setTimeout(()=>{
+
+            loader.remove();
+
+        },300);
+
+    }
+
+});
+
+</script>
+
+<!-- =====================================
+     Favorite Toggle
+===================================== -->
+
+<script>
+
+document.querySelectorAll(".favorite-btn").forEach(btn=>{
+
+    btn.addEventListener("click",async()=>{
+
+        if(!window.APP.user){
+
+            return location.href="/auth/login";
+
+        }
+
+        try{
+
+            const res=await axios.post("/api/favorite/toggle",{
+
+                shayariId:btn.dataset.id
+
+            });
+
+            showSuccess(res.data.message);
+
+            btn.classList.toggle("active");
+
+        }catch(err){
+
+            showError("Unable to update favorite.");
+
+        }
+
+    });
+
+});
+
+</script>
+
+<!-- =====================================
+     AJAX Comment Form
+===================================== -->
+
+<script>
+
+const commentForm=document.getElementById("commentForm");
+
+if(commentForm){
+
+commentForm.addEventListener("submit",async(e)=>{
+
+e.preventDefault();
+
+try{
+
+const formData=new FormData(commentForm);
+
+const payload=Object.fromEntries(formData.entries());
+
+const res=await axios.post("/api/comments",payload);
+
+showSuccess("Comment submitted.");
+
+commentForm.reset();
+
+}catch(err){
+
+showError("Comment could not be submitted.");
+
+}
+
+});
+
+}
+
+</script>
+
+<!-- =====================================
+     Share Button
+===================================== -->
+
+<script>
+
+function sharePage(){
+
+if(navigator.share){
+
+navigator.share({
+
+title:document.title,
+
+text:document.title,
+
+url:window.location.href
+
+});
+
+}else{
+
+copyText(window.location.href);
+
+}
+
+}
+
+</script>
+
+<!-- =====================================
+     Lazy Images
+===================================== -->
+
+<script>
+
+document.querySelectorAll("img[data-src]").forEach(img=>{
+
+const observer=new IntersectionObserver(entries=>{
+
+entries.forEach(entry=>{
+
+if(entry.isIntersecting){
+
+img.src=img.dataset.src;
+
+observer.unobserve(img);
+
+}
+
+});
+
+});
+
+observer.observe(img);
+
+});
+
+</script>
+
+<!-- =====================================
+     Search Auto Focus
+===================================== -->
+
+<script>
+
+const searchBox=document.querySelector("input[name='q']");
+
+if(searchBox){
+
+searchBox.addEventListener("focus",()=>{
+
+searchBox.select();
+
+});
+
+}
+
+</script>
+
+<!-- =====================================
+     Theme Placeholder
+===================================== -->
+
+<script>
+
+const theme=localStorage.getItem("theme");
+
+if(theme==="dark"){
+
+document.body.classList.add("dark-theme");
+
+}
+
+</script>
+
+<!-- =====================================
+     Custom Scripts Placeholder
+===================================== -->
+
+<% if(typeof scripts!=="undefined"){ %>
+
+<%- scripts %>
+
+<% } %>
+
+<!-- =====================================
+     End Scripts
+===================================== -->
