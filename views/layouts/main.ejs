@@ -1,23 +1,29 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 
 <head>
 
-    <meta charset="UTF-8">
+    <%- include("../partials/head") %>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title><%= title || "Hindi Shayari" %></title>
-
-    <meta name="description" content="<%= description || 'Read Latest Hindi Shayari, Love Shayari, Sad Shayari, Attitude Shayari and more.' %>">
-
-    <link rel="stylesheet" href="/css/output.css">
+    <%- style %>
 
 </head>
 
-<body class="bg-gray-100 text-gray-800">
+<body>
 
-    <%- body %>
+    <%- include("../partials/navbar") %>
+
+    <main class="container py-4">
+
+        <%- body %>
+
+    </main>
+
+    <%- include("../partials/footer") %>
+
+    <%- include("../partials/scripts") %>
+
+    <%- script %>
 
 </body>
 
