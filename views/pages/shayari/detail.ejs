@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <%- include("../../partials/head") %>
+
+</head>
+
+<body>
+
+<%- include("../../partials/navbar") %>
+
+<!-- ==================================
+Page Header
+================================== -->
+
+<section class="bg-danger text-white py-5">
+
+    <div class="container">
+
+        <div class="row">
+
+            <div class="col-lg-8">
+
+                <h1 class="display-5 fw-bold">
+
+                    <%= shayari.title %>
+
+                </h1>
+
+                <div class="mt-3">
+
+                    <% if(shayari.category){ %>
+
+                    <span class="badge bg-warning text-dark">
+
+                        <%= shayari.category.name %>
+
+                    </span>
+
+                    <% } %>
+
+                    <span class="ms-3">
+
+                        👁 <%= shayari.views || 0 %>
+
+                    </span>
+
+                    <span class="ms-3">
+
+                        ❤️ <%= shayari.likes || 0 %>
+
+                    </span>
+
+                    <span class="ms-3">
+
+                        ⭐ <%= shayari.favorites || 0 %>
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ==================================
+Breadcrumb
+================================== -->
+
+<section class="bg-light border-bottom">
+
+    <div class="container py-3">
+
+        <nav>
+
+            <ol class="breadcrumb mb-0">
+
+                <li class="breadcrumb-item">
+
+                    <a href="/">
+
+                        Home
+
+                    </a>
+
+                </li>
+
+                <li class="breadcrumb-item">
+
+                    <a href="/shayari">
+
+                        Shayari
+
+                    </a>
+
+                </li>
+
+                <li class="breadcrumb-item active">
+
+                    <%= shayari.title %>
+
+                </li>
+
+            </ol>
+
+        </nav>
+
+    </div>
+
+</section>
+
+<!-- ==================================
+Main Content
+================================== -->
+
+<section class="py-5">
+
+<div class="container">
+
+<div class="row">
+
+<div class="col-lg-8">
+
+<div class="card shadow border-0">
+
+<% if(shayari.backgroundImage){ %>
+
+<img
+src="<%= shayari.backgroundImage %>"
+class="card-img-top"
+alt="<%= shayari.imageAlt || shayari.title %>">
+
+<% } %>
+
+<div class="card-body p-4">
+
+<h2 class="fw-bold mb-4">
+
+<%= shayari.title %>
+
+</h2>
+
+<div
+class="fs-5 lh-lg text-center">
+
+<%= shayari.content %>
+
+</div>
+
+<hr>
+
+<div class="d-flex flex-wrap gap-2">
+
+<button
+class="btn btn-danger favorite-btn"
+data-id="<%= shayari._id %>">
+
+<i class="fa-solid fa-heart"></i>
+
+Favorite
+
+</button>
+
+<button
+class="btn btn-success">
+
+<i class="fa-solid fa-download"></i>
+
+Download
+
+</button>
+
+<button
+class="btn btn-primary"
+onclick="sharePage()">
+
+<i class="fa-solid fa-share"></i>
+
+Share
+
+</button>
+
+<button
+class="btn btn-secondary"
+onclick="copyText(`<%= shayari.content.replace(/`/g,'\\`') %>`)">
+
+<i class="fa-solid fa-copy"></i>
+
+Copy
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- ==================================
+Author Information
+================================== -->
+
+<div class="card shadow-sm border-0 mt-4">
+
+    <div class="card-body">
+
+        <div class="d-flex align-items-center">
+
+            <img
+                src="<%= shayari.author && shayari.author.avatar ? shayari.author.avatar : '/images/default-user.png' %>"
+                width="70"
+                height="70"
+                class="rounded-circle me-3"
+                alt="Author">
+
+            <div>
+
+                <h5 class="mb-1">
+
+                    <%= shayari.author ? shayari.author.name : 'SMS Hindi Shayari' %>
+
+                </h5>
+
+                <small class="text-muted">
+
+                    Published on
+
+                    <%= new Date(shayari.createdAt).toLocaleDateString() %>
+
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ==================================
+Tags
+================================== -->
+
+<% if(shayari.tags && shayari.tags.length){ %>
+
+<div class="mt-4">
+
+    <h5 class="fw-bold">
+
+        Tags
+
+    </h5>
+
+    <% shayari.tags.forEach(function(tag){ %>
+
+        <a
+            href="/search?q=<%= tag %>"
+            class="btn btn-outline-secondary btn-sm mb-2 me-2">
+
+            #<%= tag %>
+
+        </a>
+
+    <% }) %>
+
+</div>
+
+<% } %>
+
+<!-- ==================================
+Comments
+================================== -->
+
+<div class="card shadow-sm border-0 mt-5">
+
+    <div class="card-header bg-white">
+
+        <h4 class="mb-0">
+
+            Comments
+
+        </h4>
+
+    </div>
+
+    <div class="card-body">
+
+        <% if(user){ %>
+
+        <form
+            id="commentForm">
+
+            <input
+                type="hidden"
+                name="shayari"
+                value="<%= shayari._id %>">
+
+            <textarea
+                name="message"
+                rows="4"
+                class="form-control"
+                placeholder="Write your comment..."
+                required></textarea>
+
+            <button
+                class="btn btn-danger mt-3">
+
+                Post Comment
+
+            </button>
+
+        </form>
+
+        <% } else { %>
+
+        <div class="alert alert-warning">
+
+            Please
+
+            <a href="/auth/login">
+
+                Login
+
+            </a>
+
+            to post comments.
+
+        </div>
+
+        <% } %>
+
+        <hr>
+
+        <% if(comments && comments.length){ %>
+
+            <% comments.forEach(function(comment){ %>
+
+            <div class="mb-4">
+
+                <h6 class="fw-bold">
+
+                    <%= comment.user.name %>
+
+                </h6>
+
+                <small class="text-muted">
+
+                    <%= new Date(comment.createdAt).toLocaleString() %>
+
+                </small>
+
+                <p class="mt-2">
+
+                    <%= comment.message %>
+
+                </p>
+
+            </div>
+
+            <hr>
+
+            <% }) %>
+
+        <% } else { %>
+
+        <p class="text-muted">
+
+            No comments yet.
+
+        </p>
+
+        <% } %>
+
+    </div>
+
+</div>
+
+</div>
+
+<!-- ==================================
+Sidebar
+================================== -->
+
+<div class="col-lg-4">
+
+<div class="card shadow-sm border-0 mb-4">
+
+<div class="card-header bg-danger text-white">
+
+Trending Categories
+
+</div>
+
+<div class="list-group list-group-flush">
+
+<a
+href="/category/love"
+class="list-group-item">
+
+❤️ Love Shayari
+
+</a>
+
+<a
+href="/category/sad"
+class="list-group-item">
+
+💔 Sad Shayari
+
+</a>
+
+<a
+href="/category/attitude"
+class="list-group-item">
+
+😎 Attitude Shayari
+
+</a>
+
+<a
+href="/category/friendship"
+class="list-group-item">
+
+🤝 Friendship Shayari
+
+</a>
+
+<a
+href="/category/motivational"
+class="list-group-item">
+
+🚀 Motivational Shayari
+
+</a>
+
+</div>
+
+</div>
+
+<!-- ==================================
+Related Shayari
+================================== -->
+
+<div class="card shadow-sm border-0 mb-4">
+
+    <div class="card-header bg-danger text-white">
+
+        Related Shayari
+
+    </div>
+
+    <div class="list-group list-group-flush">
+
+        <% if(typeof relatedShayaries !== "undefined" && relatedShayaries.length){ %>
+
+            <% relatedShayaries.forEach(function(item){ %>
+
+                <a
+                    href="/shayari/<%= item.slug %>"
+                    class="list-group-item list-group-item-action">
+
+                    <strong>
+
+                        <%= item.title %>
+
+                    </strong>
+
+                    <br>
+
+                    <small class="text-muted">
+
+                        👁 <%= item.views %> |
+                        ❤️ <%= item.likes %>
+
+                    </small>
+
+                </a>
+
+            <% }) %>
+
+        <% } else { %>
+
+            <div class="list-group-item">
+
+                No related Shayari found.
+
+            </div>
+
+        <% } %>
+
+    </div>
+
+</div>
+
+<!-- ==================================
+Popular Tags
+================================== -->
+
+<div class="card shadow-sm border-0">
+
+    <div class="card-header bg-dark text-white">
+
+        Popular Tags
+
+    </div>
+
+    <div class="card-body">
+
+        <a href="/search?q=love" class="btn btn-outline-danger btn-sm mb-2">
+
+            #love
+
+        </a>
+
+        <a href="/search?q=sad" class="btn btn-outline-secondary btn-sm mb-2">
+
+            #sad
+
+        </a>
+
+        <a href="/search?q=attitude" class="btn btn-outline-dark btn-sm mb-2">
+
+            #attitude
+
+        </a>
+
+        <a href="/search?q=friendship" class="btn btn-outline-success btn-sm mb-2">
+
+            #friendship
+
+        </a>
+
+        <a href="/search?q=motivational" class="btn btn-outline-primary btn-sm mb-2">
+
+            #motivational
+
+        </a>
+
+    </div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ==================================
+SEO Content
+================================== -->
+
+<section class="py-5 bg-light">
+
+    <div class="container">
+
+        <h2 class="fw-bold">
+
+            <%= shayari.title %>
+
+        </h2>
+
+        <p class="text-muted">
+
+            Read, copy, share and download this beautiful Hindi Shayari.
+            SMS Hindi Shayari provides the latest Love, Sad, Friendship,
+            Romantic, Attitude and Motivational Shayari with beautiful
+            background images.
+
+        </p>
+
+    </div>
+
+</section>
+
+<!-- ==================================
+Footer
+================================== -->
+
+<%- include("../../partials/footer") %>
+
+<!-- ==================================
+Scripts
+================================== -->
+
+<%- include("../../partials/scripts") %>
+
+</body>
+
+</html>
